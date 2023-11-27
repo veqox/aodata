@@ -3,13 +3,16 @@ extern crate dotenv_codegen;
 
 use bytes::Bytes;
 use futures_util::stream::StreamExt;
-use serde_json::Number;
 use sqlx::types::chrono;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use sqlx::{Pool, Postgres};
 use std::process::exit;
 use std::{str::FromStr, sync::Arc};
 use tokio::sync::RwLock;
+
+mod models;
+use models::db;
+use models::nats;
 
 type Mutex = Arc<RwLock<Vec<Bytes>>>;
 
@@ -71,7 +74,7 @@ async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async
         let queue_slice: Vec<Bytes> = queue_lock.drain(0..queue_size).collect();
         drop(queue_lock);
 
-        let mut messages: Vec<NatsMessage> = Vec::new();
+        let mut messages: Vec<nats::MarketOrder> = Vec::new();
 
         for message in queue_slice {
             messages.push(serde_json::from_slice(&message).unwrap());
@@ -99,7 +102,7 @@ async fn insert_locations_from_file(path: &str, pool: &PgPool) -> Result<(), sql
 
     let content = std::fs::read_to_string(locations_path).unwrap();
 
-    let locations: Vec<Location> = serde_json::from_str(&content).unwrap();
+    let locations: Vec<db::Location> = serde_json::from_str(&content).unwrap();
 
     let transaction = pool.begin().await.unwrap();
 
@@ -121,7 +124,7 @@ async fn insert_locations_from_file(path: &str, pool: &PgPool) -> Result<(), sql
 
 async fn insert_market_orders(
     pool: &PgPool,
-    market_orders: Vec<NatsMessage>,
+    market_orders: Vec<nats::MarketOrder>,
 ) -> Result<(), sqlx::Error> {
     let transaction = pool.begin().await.unwrap();
 
@@ -182,7 +185,7 @@ async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(),
 
     let content = std::fs::read_to_string(localizations_path).unwrap();
 
-    let localizations: Vec<Localization> = serde_json::from_str(&content).unwrap();
+    let localizations: Vec<db::Localization> = serde_json::from_str(&content).unwrap();
 
 
     let transaction = pool.begin().await.unwrap();
@@ -278,87 +281,4 @@ async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(),
     transaction.commit().await.unwrap();
 
     Ok(())
-}
-
-#[derive(serde::Deserialize)]
-struct Location {
-    #[serde(rename = "Index")]
-    id: String,
-    #[serde(rename = "UniqueName")]
-    name: String,
-}
-
-#[derive(serde::Deserialize)]
-struct Localization {
-    #[serde(rename = "LocalizedNames")]
-    localized_names: Option<LocalizedValues>,
-
-    #[serde(rename = "LocalizedDescriptions")]
-    localized_descriptions: Option<LocalizedValues>,
-
-    #[serde(rename = "UniqueName")]
-    item: String,
-}
-
-#[derive(serde::Deserialize)]
-struct LocalizedValues {
-    #[serde(rename = "EN-US")]
-    en_us: String,
-    #[serde(rename = "DE-DE")]
-    de_de: String,
-    #[serde(rename = "FR-FR")]
-    fr_fr: String,
-    #[serde(rename = "RU-RU")]
-    ru_ru: String,
-    #[serde(rename = "PL-PL")]
-    pl_pl: String,
-    #[serde(rename = "ES-ES")]
-    es_es: String,
-    #[serde(rename = "PT-BR")]
-    pt_br: String,
-    #[serde(rename = "IT-IT")]
-    it_it: String,
-    #[serde(rename = "ZH-CN")]
-    zh_cn: String,
-    #[serde(rename = "KO-KR")]
-    ko_kr: String,
-    #[serde(rename = "JA-JP")]
-    ja_jp: String,
-    #[serde(rename = "ZH-TW")]
-    zh_tw: String,
-    #[serde(rename = "ID-ID")]
-    id_id: String,
-}
-
-#[derive(serde::Deserialize)]
-struct NatsMessage {
-    #[serde(rename = "Id")]
-    id: Number,
-
-    #[serde(rename = "ItemTypeId")]
-    item_id: String,
-
-    #[serde(rename = "ItemGroupTypeId")]
-    group_type_id: String,
-
-    #[serde(rename = "LocationId")]
-    location_id: Number,
-
-    #[serde(rename = "QualityLevel")]
-    quality_level: Number,
-
-    #[serde(rename = "EnchantmentLevel")]
-    enchantment_level: Number,
-
-    #[serde(rename = "UnitPriceSilver")]
-    unit_price_silver: Number,
-
-    #[serde(rename = "Amount")]
-    amount: Number,
-
-    #[serde(rename = "AuctionType")]
-    auction_type: String,
-
-    #[serde(rename = "Expires")]
-    expires: String,
 }
