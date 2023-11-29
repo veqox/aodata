@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM market_order WHERE expires_at < NOW() OR updated_at < NOW() - INTERVAL '1 day'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "1079d02f3cf22345c60d4cdf0db24169a6378dfbb2bac4d8716e9c4f98e05ed3"
+}
