@@ -18,7 +18,14 @@ type Mutex = Arc<RwLock<Vec<Bytes>>>;
 
 #[tokio::main]
 async fn main() -> Result<(), async_nats::Error> {
-    let db_url = dotenv!("DATABASE_URL");
+    let db_url = match std::env::var("ENV") {
+        Ok(env) => match env.as_str() {
+            "PROD" => dotenv!("PROD_DATABASE_URL"),
+            "DEV" => dotenv!("DATABASE_URL"),
+            _ => dotenv!("DATABASE_URL"),
+        },
+        Err(_) => dotenv!("DATABASE_URL"),
+    };
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -26,8 +33,12 @@ async fn main() -> Result<(), async_nats::Error> {
         .await
         .unwrap();
 
-    insert_localizations_from_file(dotenv!("LOCALIZATIONS_PATH"), &pool).await.unwrap();
-    insert_locations_from_file(dotenv!("LOCATIONS_PATH"), &pool).await.unwrap();
+    insert_localizations_from_file(dotenv!("LOCALIZATIONS_PATH"), &pool)
+        .await
+        .unwrap();
+    insert_locations_from_file(dotenv!("LOCATIONS_PATH"), &pool)
+        .await
+        .unwrap();
 
     let mutex: Mutex = Arc::new(RwLock::new(Vec::new()));
 
@@ -42,28 +53,75 @@ async fn main() -> Result<(), async_nats::Error> {
         .await
         .unwrap();
 
-    print!("Connected to NATS server at {}...\n", nats_url);
+    let message_handler = tokio::spawn(handle_messages(mutex.clone(), pool.clone()));
+    let cleanup_handler = tokio::spawn(cleanup_data(pool.clone()));
+
+    print!(
+        "{} Connected to NATS server at {}...\n",
+        chrono::Local::now(),
+        nats_url
+    );
 
     let mut subscriber = client.subscribe(nats_subject).await.unwrap();
 
-    print!("Subscribed to subject {}...\n", nats_subject);
-
-    let join_handle = tokio::spawn(handle_messages(mutex.clone(), pool.clone()));
+    print!(
+        "{} Subscribed to subject {}...\n",
+        chrono::Local::now(),
+        nats_subject
+    );
 
     while let Some(msg) = subscriber.next().await {
         mutex.write().await.push(msg.payload);
     }
 
-    _ = tokio::join!(join_handle);
+    _ = tokio::join!(message_handler, cleanup_handler);
+
+    pool.close().await;
 
     Ok(())
 }
 
+async fn cleanup_data(pool: Pool<Postgres>) -> Result<(), sqlx::Error> {
+    print!(
+        "{} cleanup_data: Starting cleanup thread...\n",
+        chrono::Local::now()
+    );
+
+    loop {
+        // Perform cleanup every 15 minutes
+        tokio::time::sleep(tokio::time::Duration::from_secs(900)).await;
+
+        print!(
+            "{} cleanup_data: Cleaning up old data...\n",
+            chrono::Local::now()
+        );
+        let transaction = pool.begin().await.unwrap();
+
+        let affected_rows = sqlx::query!("DELETE FROM market_order WHERE expires_at < NOW() OR updated_at < NOW() - INTERVAL '1 day'")
+            .execute(&pool)
+            .await
+            .unwrap();
+
+        print!(
+            "{} cleanup_data: Deleted {} rows...\n",
+            chrono::Local::now(),
+            affected_rows.rows_affected()
+        );
+
+        transaction.commit().await.unwrap();
+    }
+}
+
 async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async_nats::Error> {
+    print!(
+        "{} handle_messages: Starting message handler thread...\n",
+        chrono::Local::now()
+    );
+
     loop {
         let queue_size = mutex.read().await.len();
 
-        if queue_size < 100 {
+        if queue_size < 200 {
             tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
             continue;
         }
@@ -85,7 +143,8 @@ async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async
         let end = chrono::Utc::now();
 
         print!(
-            "Inserted {} market orders in {} ms...\n",
+            "{} handle_messages: Inserted {} market orders in {} ms...\n",
+            chrono::Local::now(),
             queue_size,
             end.signed_duration_since(start).num_milliseconds()
         );
@@ -140,10 +199,11 @@ async fn insert_market_orders(
                 enchantment_level, 
                 unit_price_silver, 
                 amount, 
-                auction_type, 
+                auction_type,
                 expires_at, 
                 created_at, 
-                updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+                updated_at) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
                 ON CONFLICT (id) DO UPDATE 
                 SET unit_price_silver = $6, 
                 amount = $7,
@@ -165,7 +225,7 @@ async fn insert_market_orders(
         .await;
 
         if result.is_err() {
-            print!("Error inserting market order: {:?}\n", result);
+            print!("{} Error inserting market orders \n", chrono::Local::now(),);
         }
     }
 
@@ -175,7 +235,6 @@ async fn insert_market_orders(
 }
 
 async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(), sqlx::Error> {
-
     let localizations_path = std::path::Path::new(path);
 
     if !localizations_path.exists() {
@@ -186,7 +245,6 @@ async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(),
     let content = std::fs::read_to_string(localizations_path).unwrap();
 
     let localizations: Vec<db::Localization> = serde_json::from_str(&content).unwrap();
-
 
     let transaction = pool.begin().await.unwrap();
 
@@ -213,7 +271,7 @@ async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(),
                     es_es, 
                     pt_br, 
                     it_it, 
-                    zh_ch, 
+                    zh_cn, 
                     ko_kr, 
                     ja_jp, 
                     zh_tw, 
@@ -256,7 +314,8 @@ async fn insert_localizations_from_file(path: &str, pool: &PgPool) -> Result<(),
                     ko_kr, 
                     ja_jp, 
                     zh_tw, 
-                    id_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT DO NOTHING",
+                    id_id) 
+                    VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT DO NOTHING",
                 localization.item,
                 localized_descriptions.en_us,
                 localized_descriptions.de_de,

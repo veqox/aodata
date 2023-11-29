@@ -1,14 +1,11 @@
 services:
   aodata-nats:
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@aodata-db:5432/ao
-    env_file:
-      - .env
+    container_name: aodata-nats
     build:
       context: .
       dockerfile: Dockerfile
     volumes: 
-      - ./data:/aodata-nats/data
+      - ./data:/data
     restart: unless-stopped
     depends_on:
       - aodata-db

@@ -4,4 +4,3 @@ data/
 download.sh
 .gitignore
 docker-compose.yml
-migrations/
