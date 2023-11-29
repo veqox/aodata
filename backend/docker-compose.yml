@@ -1,3 +1,4 @@
 include:
   - aodata-db/docker-compose.yml
   - aodata-nats/docker-compose.yml
+  - aodata-api/docker-compose.yml
