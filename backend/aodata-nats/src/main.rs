@@ -225,7 +225,7 @@ async fn insert_market_orders(
         .await;
 
         if result.is_err() {
-            print!("{} Error inserting market orders \n", chrono::Local::now(),);
+            print!("{} Error inserting market order {} \n", chrono::Local::now(), market_order.item_id);
         }
     }
 
