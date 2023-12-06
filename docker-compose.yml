@@ -1,0 +1,5 @@
+include:
+  - backend/aodata-db/docker-compose.yml
+  - backend/aodata-nats/docker-compose.yml
+  - backend/aodata-api/docker-compose.yml
+  - frontend/docker-compose.yml
