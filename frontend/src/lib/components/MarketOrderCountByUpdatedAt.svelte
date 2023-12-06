@@ -1,25 +1,26 @@
 <script lang="ts">
 	import type { MarketOrderCountByUpdatedAt } from "$lib/types";
-	import { Chart, Colors } from "chart.js";
+	import { Chart, Colors } from "chart.js/auto";
+	import 'chartjs-adapter-date-fns';
 	import { onMount } from "svelte";
 
 	export let data: MarketOrderCountByUpdatedAt[];
 	let canvas: HTMLCanvasElement;
-	let formatter = Intl.NumberFormat("en", { notation: "compact" });
-	let chart: Chart<"doughnut"> | undefined;
 
 	onMount(() => {
-		Colors.defaults.forceOverride = true;
-
-
-        new Chart(canvas, {
+		new Chart(canvas, {
 			type: "line",
 			data: {
-				labels: data.map(d => new Date(d.updated_at)),
+				labels: data.map(
+					(d) => new Date(d.updated_at),
+				),
 				datasets: [
 					{
-						label: "Count",
-						data: data.map(d => d.count),
+						data: data.map(
+							(d) => d.count,
+						),
+						borderColor: "#7480ff",
+						backgroundColor: "#7480ff"
 					},
 				],
 			},
@@ -30,9 +31,7 @@
 					legend: {
 						display: false,
 					},
-					colors: Colors.defaults,
 				},
-				borderColor: "#1D232A",
 				animation: false,
 				scales: {
 					x: {
@@ -42,14 +41,11 @@
 						},
 						title: {
 							display: true,
-							text: "Date",
-							
 						},
 					},
 					y: {
 						title: {
-							display: true,
-							text: "Count",
+							display: false,
 						},
 					},
 				},
@@ -58,9 +54,4 @@
 	});
 </script>
 
-<div class="stat">
-	<div class="text-xl stat-title">Market Orders by Date</div>
-	<div class="stat-value">    
-		<canvas bind:this={canvas}> </canvas>
-	</div>
-</div>
+<canvas bind:this={canvas}></canvas>

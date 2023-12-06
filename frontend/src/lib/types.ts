@@ -38,3 +38,14 @@ export interface LocalizedNames {
     zh_tw: string,
     id_id: string,
 }
+
+export interface MarketOrder {
+    location: string,
+    quality_level: number,
+    enchantment_level: number,
+    unit_price_silver: number,
+    amount: number,
+    auction_type: string,
+    expires_at: Date,
+    updated_at: Date,
+}

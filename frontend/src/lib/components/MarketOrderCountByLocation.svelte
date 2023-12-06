@@ -1,60 +1,59 @@
 <script lang="ts">
 	import type { MarketOrderCountByLocation } from "$lib/types";
-	import { Chart, Colors } from "chart.js";
+	import ChartDataLabels from "chartjs-plugin-datalabels";
+	import { Chart, Colors } from "chart.js/auto";
 	import { onMount } from "svelte";
 
 	export let data: MarketOrderCountByLocation[];
 	let canvas: HTMLCanvasElement;
-	let formatter = Intl.NumberFormat("en", { notation: "compact" });
-	let chart: Chart<"doughnut"> | undefined;
 
 	onMount(() => {
-		Colors.defaults.forceOverride = true;
-
-		chart = new Chart(canvas, {
+		new Chart(canvas, {
 			type: "doughnut",
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				plugins: {
-					legend: {
-						display: false,
-					},
-					colors: Colors.defaults,
-				},
-				borderColor: "#1D232A",
-				animation: false,
-			},
 			data: {
 				labels: data.map((d) => d.location),
 				datasets: [
 					{
 						data: data.map((d) => d.count),
 						borderRadius: 7,
+						backgroundColor: [
+							"#7480ff",
+							"#6873e5",
+							"#5c66cc",
+							"#5159b2",
+							"#454c99",
+							"#3a407f",
+							"#2e3366",
+							"#292d5b",
+						],
+						
 					},
 				],
 			},
+			plugins: [ChartDataLabels],
+			options: {
+				responsive: true,
+				maintainAspectRatio: true,
+				plugins: {
+					legend: {
+						display: false,
+					},
+					datalabels: {
+						display: true,
+						font: {
+							size: 15
+						},
+						formatter: (val, ctx) => {
+							return `${ctx.chart.data.labels![ctx.dataIndex]}: ${Intl.NumberFormat("en", { notation: "compact" }).format(val)}`
+						}
+					}
+				},
+				borderColor: "#1D232A",
+				backgroundColor: "#7480ff",
+				animation: false,
+			},
 		});
-
-		function a() {
-			return 
-		}
 	});
 </script>
 
-<div class="stat">
-	<div class="text-xl stat-title">Market Orders by Location</div>
-	<div class="stat-value">
-		<ul>
-			{#each data as { location, count }, i}
-				<li style="color: {chart?.data.datasets[0].backgroundColor[i]}">
-					{location}
-					{formatter.format(count)}
-				</li>
-			{/each}
-		</ul>
-	</div>
-	<div class="hidden stat-figure md:block">
-		<canvas bind:this={canvas}> </canvas>
-	</div>
-</div>
+<canvas bind:this={canvas}> </canvas>
