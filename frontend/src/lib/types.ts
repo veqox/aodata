@@ -13,7 +13,7 @@ export interface MarketOrderCountByAuctionType {
     count: number;
 }
 
-export interface MakretOrderCountByUpdatedAt {
+export interface MarketOrderCountByUpdatedAt {
     updated_at: Date;
     count: number;
 }
