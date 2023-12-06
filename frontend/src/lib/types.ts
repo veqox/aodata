@@ -21,3 +21,20 @@ export interface MarketOrderCountByUpdatedAt {
 export interface MarketOrderCount {
     count: number;
 }
+
+export interface LocalizedNames {
+    item_unique_name: string,
+    en_us: string,
+    de_de: string,
+    fr_fr: string,
+    ru_ru: string,
+    pl_pl: string,
+    es_es: string,
+    pt_br: string,
+    it_it: string,
+    zh_cn: string,
+    ko_kr: string,
+    ja_jp: string,
+    zh_tw: string,
+    id_id: string,
+}
