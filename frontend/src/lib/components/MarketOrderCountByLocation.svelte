@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { MarketOrderCountByLocation } from "$lib/types";
-	import ChartDataLabels from "chartjs-plugin-datalabels";
 	import { Chart, Colors } from "chart.js/auto";
 	import { onMount } from "svelte";
 
@@ -9,7 +8,7 @@
 
 	onMount(() => {
 		new Chart(canvas, {
-			type: "doughnut",
+			type: "bar",
 			data: {
 				labels: data.map((d) => d.location),
 				datasets: [
@@ -30,7 +29,6 @@
 					},
 				],
 			},
-			plugins: [ChartDataLabels],
 			options: {
 				responsive: true,
 				maintainAspectRatio: true,
@@ -38,15 +36,6 @@
 					legend: {
 						display: false,
 					},
-					datalabels: {
-						display: true,
-						font: {
-							size: 15
-						},
-						formatter: (val, ctx) => {
-							return `${ctx.chart.data.labels![ctx.dataIndex]}: ${Intl.NumberFormat("en", { notation: "compact" }).format(val)}`
-						}
-					}
 				},
 				borderColor: "#1D232A",
 				backgroundColor: "#7480ff",

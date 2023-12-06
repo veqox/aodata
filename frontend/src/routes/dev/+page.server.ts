@@ -2,10 +2,10 @@ import type { MakretOrderCountByUpdatedAt, MarketOrderCount, MarketOrderCountByA
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({fetch}) => {
-    let market_order_count_by_location_response = await fetch("http://veqox.dedyn.io/api/statistics/orders/location");
-    let market_order_count_by_auction_type_response = await fetch("http://veqox.dedyn.io/api/statistics/orders/auction_type");
-    let market_order_count_by_updated_at_response = await fetch("http://veqox.dedyn.io/api/statistics/orders/hourly");
-    let market_order_count_response = await fetch("http://veqox.dedyn.io/api/statistics/orders/count");
+    let market_order_count_by_location_response = await fetch("http://aodata-api/api/statistics/orders/location");
+    let market_order_count_by_auction_type_response = await fetch("http://aodata-api/api/statistics/orders/auction_type");
+    let market_order_count_by_updated_at_response = await fetch("http://aodata-api/api/statistics/orders/hourly");
+    let market_order_count_response = await fetch("http://aodata-api/api/statistics/orders/count");
 
     let market_order_count_by_location = await market_order_count_by_location_response.json() as MarketOrderCountByLocation[];
     let market_order_count_by_auction_type = await market_order_count_by_auction_type_response.json() as MarketOrderCountByAuctionType[];
