@@ -1,5 +1,6 @@
 services:
   aodata-frontend:
+    container_name: aodata-frontend
     build:
       context: .
       dockerfile: Dockerfile
