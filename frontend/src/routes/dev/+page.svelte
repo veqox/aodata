@@ -24,32 +24,29 @@
 		</div>
 
 		<div class="col-span-3 shadow stat">
-			<div class="stat-title">
-				Market Orders
-			</div>
+			<div class="stat-title">Market Orders By Creation Date</div>
 			<div class="stat-value">
 				<MarketOrderCountByCreatedAt
-				data={data.props.data.market_order_count_by_created_at}
-			/>
+					data={data.props.data.market_order_count_by_created_at}
+				/>
 			</div>
 		</div>
 		<div class="col-span-3 shadow stat">
-			<div class="stat-title">
-				Market Orders
-			</div>
+			<div class="stat-title">Market Orders By Last Update</div>
 			<div class="stat-value">
 				<MarketOrderCountByUpdatedAt
-				data={data.props.data.market_order_count_by_updated_at}
-			/>
+					data={data.props.data.market_order_count_by_updated_at}
+				/>	
 			</div>
 		</div>
 
-		<div class="col-span-3">
-			<MarketOrderCountByLocation
-				data={data.props.data.market_order_count_by_location.filter(
-					(i) => i.count > 50000,
-				)}
+		<div class="col-span-3 shadow stat">
+			<div class="stat-title">Market Orders By Location</div>
+			<div class="stat-value">
+				<MarketOrderCountByLocation
+				data={data.props.data.market_order_count_by_location}
 			/>
+			</div>
 		</div>
 	</div>
 </div>

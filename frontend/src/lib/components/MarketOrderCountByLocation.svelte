@@ -37,6 +37,18 @@
 						display: false,
 					},
 				},
+				scales: {
+					x: {
+						grid: {
+							display: false
+						}
+					},
+					y: {
+						grid: {
+							display: false
+						}
+					},
+				},
 				borderColor: "#1D232A",
 				backgroundColor: "#7480ff",
 				animation: false,

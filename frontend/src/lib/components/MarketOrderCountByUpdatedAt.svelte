@@ -37,16 +37,22 @@
 					x: {
 						type: "time",
 						time: {
-							unit: "hour", // Adjust as needed (hour, month, year, etc.)
+							unit: "hour",
 						},
 						title: {
 							display: true,
 						},
+                        grid: {
+                            display: false
+                        }
 					},
 					y: {
 						title: {
 							display: false,
 						},
+                        grid: {
+                            display: false
+                        }
 					},
 				},
 			},
