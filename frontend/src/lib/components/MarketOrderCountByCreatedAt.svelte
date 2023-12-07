@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { MarketOrderCountByUpdatedAt } from "$lib/types";
+	import type { MarketOrderCountByCreatedAt } from "$lib/types";
 	import { Chart } from "chart.js/auto";
 	import 'chartjs-adapter-date-fns';
 	import { onMount } from "svelte";
 
-	export let data: MarketOrderCountByUpdatedAt[];
+	export let data: MarketOrderCountByCreatedAt[];
 	let canvas: HTMLCanvasElement;
 
 	onMount(() => {

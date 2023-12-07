@@ -4,6 +4,7 @@
 	import MarketOrderCount from "$lib/components/MarketOrderCount.svelte";
 	import MarketOrderCountByLocation from "$lib/components/MarketOrderCountByLocation.svelte";
 	import MarketOrderCountByAuctionType from "$lib/components/MarketOrderCountByAuctionType.svelte";
+	import MarketOrderCountByCreatedAt from "$lib/components/MarketOrderCountByCreatedAt.svelte";
 	import MarketOrderCountByUpdatedAt from "$lib/components/MarketOrderCountByUpdatedAt.svelte";
 
 	export let data: PageServerData;
@@ -22,10 +23,25 @@
 			{/each}
 		</div>
 
-		<div class="col-span-3">
-			<MarketOrderCountByUpdatedAt
+		<div class="col-span-3 shadow stat">
+			<div class="stat-title">
+				Market Orders
+			</div>
+			<div class="stat-value">
+				<MarketOrderCountByCreatedAt
+				data={data.props.data.market_order_count_by_created_at}
+			/>
+			</div>
+		</div>
+		<div class="col-span-3 shadow stat">
+			<div class="stat-title">
+				Market Orders
+			</div>
+			<div class="stat-value">
+				<MarketOrderCountByUpdatedAt
 				data={data.props.data.market_order_count_by_updated_at}
 			/>
+			</div>
 		</div>
 
 		<div class="col-span-3">

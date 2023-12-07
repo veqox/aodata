@@ -18,6 +18,11 @@ export interface MarketOrderCountByUpdatedAt {
     count: number;
 }
 
+export interface MarketOrderCountByCreatedAt {
+    updated_at: Date;
+    count: number;
+}
+
 export interface MarketOrderCount {
     count: number;
 }
