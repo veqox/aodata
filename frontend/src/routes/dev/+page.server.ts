@@ -14,6 +14,8 @@ export const load: PageServerLoad = async ({fetch}) => {
     let market_order_count_by_created_at = await market_order_count_by_created_at_response.json() as MarketOrderCountByCreatedAt[]
     let market_order_count = await market_order_count_response.json() as MarketOrderCount;
 
+
+
     return {
         props: {
             data: {

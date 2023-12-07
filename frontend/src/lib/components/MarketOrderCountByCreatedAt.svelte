@@ -12,7 +12,7 @@
 			type: "line",
 			data: {
 				labels: data.map(
-					(d) => new Date(d.updated_at),
+					(d) => new Date(d.created_at),
 				),
 				datasets: [
 					{
