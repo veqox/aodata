@@ -5,6 +5,7 @@
 	import { onMount } from "svelte";
 
 	export let data: MarketOrderCountByUpdatedAtAndLocation[];
+	export let minAmount: number;
 	let canvas: HTMLCanvasElement;
 
 	onMount(() => {
@@ -25,23 +26,29 @@
 		let datasets: { label: string; data: number[], backgroundColor: string, borderColor: string }[] = [];
 
 		labels.forEach((label, i) => {
-			let dataset = datasets.find((d) => d.label === label) ?? {
+			let orderCounts = data.filter((d) => d.location === label).map((d) => d.count);
+
+			if (orderCounts.reduce((sum, val) => sum += val) < minAmount) {
+				return;
+			}
+
+			datasets.push({
 				label,
-				data: [],
+				data: orderCounts,
 				backgroundColor: colors[i % colors.length],
 				borderColor: colors[i % colors.length],
-			};
+			});
+		}); 
 
-			data.filter((d) => d.location === label).forEach((d) =>
-				dataset.data.push(d.count),
-			);
-			datasets.push(dataset);
+		datasets.sort((a, b) => {
+			return a.data.reduce((sum, val) => sum += val) < b.data.reduce((sum, val) => sum += val) ?
+				1 : -1
+		})
+
+		datasets.forEach((dataset, i) => {
+			dataset.backgroundColor = colors[i % colors.length];
+			dataset.borderColor = colors[i % colors.length];
 		});
-
-
-		for (let label of labels) 
-
-		console.log(datasets);
 
 		new Chart(canvas, {
 			type: "line",

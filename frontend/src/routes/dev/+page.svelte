@@ -50,6 +50,7 @@
 			<div class="stat-value">
 				<MarketOrderCountByUpdatedAtAndLocation
 					data={data.props.data.market_order_count_by_updated_at_and_location}
+					minAmount={10000}
 				/>	
 			</div>
 		</div>
@@ -59,6 +60,7 @@
 			<div class="stat-value">
 				<MarketOrderCountByLocation
 				data={data.props.data.market_order_count_by_location}
+				minAmount={10000}
 			/>
 			</div>
 		</div>

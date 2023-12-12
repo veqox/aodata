@@ -4,9 +4,13 @@
 	import { onMount } from "svelte";
 
 	export let data: MarketOrderCountByLocation[];
+	export let minAmount: number;
 	let canvas: HTMLCanvasElement;
 
 	onMount(() => {
+
+		data = data.filter((d) => d.count > minAmount);
+
 		new Chart(canvas, {
 			type: "bar",
 			data: {
