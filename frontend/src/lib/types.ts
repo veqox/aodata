@@ -52,7 +52,9 @@ export interface LocalizedNames {
 }
 
 export interface MarketOrder {
-    location: string,
+    id: number,
+    item_unique_name: string,
+    location_id: string,
     quality_level: number,
     enchantment_level: number,
     unit_price_silver: number,
@@ -60,4 +62,10 @@ export interface MarketOrder {
     auction_type: string,
     expires_at: Date,
     updated_at: Date,
+    created_at: Date,
+}
+
+export interface Location {
+    id: string,
+    name: string,
 }
