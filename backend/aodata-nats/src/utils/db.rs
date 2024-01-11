@@ -1,9 +1,12 @@
 use std::str::FromStr;
 
-use sqlx::{PgPool, types::chrono};
 use crate::models::{json, nats};
+use sqlx::{types::chrono, PgPool};
 
-pub async fn insert_locations(pool: &PgPool, locations: Vec<json::Location>) -> Result<(), sqlx::Error> {
+pub async fn insert_locations(
+    pool: &PgPool,
+    locations: Vec<json::Location>,
+) -> Result<(), sqlx::Error> {
     let transaction = pool.begin().await.unwrap();
 
     for location in locations {
@@ -26,61 +29,117 @@ pub async fn insert_market_orders(
     pool: &PgPool,
     market_orders: Vec<nats::MarketOrder>,
 ) -> Result<(), sqlx::Error> {
+    let mut ids: Vec<i64> = Vec::new();
+    let mut item_unique_names: Vec<String> = Vec::new();
+    let mut location_ids: Vec<String> = Vec::new();
+    let mut quality_levels: Vec<i32> = Vec::new();
+    let mut enchantment_levels: Vec<i32> = Vec::new();
+    let mut unit_price_silvers: Vec<i32> = Vec::new();
+    let mut amounts: Vec<i32> = Vec::new();
+    let mut auction_types: Vec<String> = Vec::new();
+    let mut expires_ats: Vec<chrono::NaiveDateTime> = Vec::new();
+    let mut created_ats: Vec<chrono::NaiveDateTime> = Vec::new();
+    let mut updated_ats: Vec<chrono::NaiveDateTime> = Vec::new();
+
+    market_orders.iter().rev().for_each(|market_order| {
+        if ids.contains(&market_order.id.as_i64().unwrap()) {
+            return;
+        }
+
+        ids.push(market_order.id.as_i64().unwrap());
+        item_unique_names.push(market_order.item_id.clone());
+        location_ids.push(format!("{:0>4}", market_order.location_id.to_string()));
+        quality_levels.push(market_order.quality_level.as_i64().unwrap() as i32);
+        enchantment_levels.push(market_order.enchantment_level.as_i64().unwrap() as i32);
+        unit_price_silvers.push(market_order.unit_price_silver.as_i64().unwrap() as i32);
+        amounts.push(market_order.amount.as_i64().unwrap() as i32);
+        auction_types.push(market_order.auction_type.clone());
+        expires_ats.push(chrono::NaiveDateTime::from_str(&market_order.expires.as_str()).unwrap());
+        created_ats.push(chrono::Utc::now().naive_utc());
+        updated_ats.push(chrono::Utc::now().naive_utc());
+    });
+
     let transaction = pool.begin().await.unwrap();
 
-    for market_order in market_orders {
-        let now = chrono::Utc::now().naive_utc();
+    let result = sqlx::query!(
+        "INSERT INTO market_order (
+            id, 
+            item_unique_name, 
+            location_id, 
+            quality_level, 
+            enchantment_level, 
+            unit_price_silver, 
+            amount, 
+            auction_type,
+            expires_at, 
+            created_at, 
+            updated_at) 
+        SELECT * FROM UNNEST(
+            $1::BIGINT[], 
+            $2::VARCHAR[], 
+            $3::VARCHAR[],
+            $4::INT[], 
+            $5::INT[], 
+            $6::INT[], 
+            $7::INT[], 
+            $8::VARCHAR[], 
+            $9::TIMESTAMP[], 
+            $10::TIMESTAMP[], 
+            $11::TIMESTAMP[]) 
+        ON CONFLICT (id) DO 
+            UPDATE SET 
+                unit_price_silver = EXCLUDED.unit_price_silver, 
+                amount = EXCLUDED.amount,
+                expires_at = EXCLUDED.expires_at,
+                updated_at = EXCLUDED.updated_at",
+        &ids,
+        &item_unique_names,
+        &location_ids,
+        &quality_levels,
+        &enchantment_levels,
+        &unit_price_silvers,
+        &amounts,
+        &auction_types,
+        &expires_ats,
+        &created_ats,
+        &updated_ats
+    )
+    .execute(pool)
+    .await;
 
-        let result = sqlx::query!(
-            "INSERT INTO market_order (
-                id, 
-                item_unique_name, 
-                location_id, 
-                quality_level, 
-                enchantment_level, 
-                unit_price_silver, 
-                amount, 
-                auction_type,
-                expires_at, 
-                created_at, 
-                updated_at) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-                ON CONFLICT (id) DO UPDATE 
-                SET unit_price_silver = $6, 
-                amount = $7,
-                expires_at = $9,
-                updated_at = $11",
-            market_order.id.as_i64().unwrap(),
-            market_order.item_id,
-            format!("{:0>4}", market_order.location_id.to_string()),
-            market_order.quality_level.as_i64().unwrap() as i32,
-            market_order.enchantment_level.as_i64().unwrap() as i32,
-            market_order.unit_price_silver.as_i64().unwrap() as i32,
-            market_order.amount.as_i64().unwrap() as i32,
-            market_order.auction_type,
-            chrono::NaiveDateTime::from_str(&market_order.expires.as_str()).unwrap(),
-            now,
-            now
-        )
-        .execute(pool)
-        .await;
-
-        if result.is_err() {
-            print!("{} Error inserting market order {} \n", chrono::Local::now(), market_order.item_id);
-        }
+    if result.is_err() {
+        print!("{} Error inserting market orders\n", chrono::Local::now());
     }
 
-    transaction.commit().await.unwrap();
+    match result {
+        Ok(_) => {
+            transaction.commit().await.unwrap();
+        }
+        Err(e) => {
+            print!(
+                "{} Error inserting market orders: {}\n",
+                chrono::Local::now(),
+                e
+            );
+            transaction.rollback().await.unwrap();
+        }
+    }
 
     Ok(())
 }
 
-pub async fn insert_localizations(pool: &PgPool, localizations: Vec<json::Localization>) -> Result<(), sqlx::Error> {
+pub async fn insert_localizations(
+    pool: &PgPool,
+    localizations: Vec<json::Localization>,
+) -> Result<(), sqlx::Error> {
     let transaction = pool.begin().await.unwrap();
 
     for localization in localizations {
         sqlx::query!(
-            "INSERT INTO item (unique_name) VALUES ($1) ON CONFLICT DO NOTHING",
+            "INSERT INTO item (unique_name) 
+            VALUES ($1) 
+            ON CONFLICT DO 
+                NOTHING",
             localization.item
         )
         .execute(pool)
@@ -106,7 +165,23 @@ pub async fn insert_localizations(pool: &PgPool, localizations: Vec<json::Locali
                     ja_jp, 
                     zh_tw, 
                     id_id) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT DO NOTHING",
+                VALUES (
+                        $1, 
+                        $2, 
+                        $3, 
+                        $4, 
+                        $5, 
+                        $6, 
+                        $7, 
+                        $8, 
+                        $9, 
+                        $10,
+                        $11,
+                        $12, 
+                        $13, 
+                        $14) 
+                ON CONFLICT DO 
+                    NOTHING",
                 localization.item,
                 localized_names.en_us,
                 localized_names.de_de,
@@ -145,7 +220,23 @@ pub async fn insert_localizations(pool: &PgPool, localizations: Vec<json::Locali
                     ja_jp, 
                     zh_tw, 
                     id_id) 
-                    VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT DO NOTHING",
+                VALUES ( 
+                    $1, 
+                    $2, 
+                    $3, 
+                    $4, 
+                    $5, 
+                    $6, 
+                    $7, 
+                    $8, 
+                    $9, 
+                    $10, 
+                    $11, 
+                    $12, 
+                    $13, 
+                    $14) 
+                ON CONFLICT DO 
+                    NOTHING",
                 localization.item,
                 localized_descriptions.en_us,
                 localized_descriptions.de_de,

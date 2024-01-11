@@ -96,7 +96,7 @@ async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async
     loop {
         let queue_size = mutex.read().await.len();
 
-        if queue_size < 200 {
+        if queue_size < 1000 {
             tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
             continue;
         }
