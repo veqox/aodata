@@ -113,14 +113,14 @@ async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async
             messages.push(serde_json::from_slice(&message).unwrap());
         }
 
-        utils::db::insert_market_orders(&pool, messages).await.unwrap();
+        let rows_affected = utils::db::insert_market_orders(&pool, messages).await.unwrap();
 
         let end = chrono::Utc::now();
 
         print!(
             "{} handle_messages: Inserted {} market orders in {} ms...\n",
             chrono::Local::now(),
-            queue_size,
+            rows_affected,
             end.signed_duration_since(start).num_milliseconds()
         );
     }

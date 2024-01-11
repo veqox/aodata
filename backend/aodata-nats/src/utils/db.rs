@@ -28,7 +28,7 @@ pub async fn insert_locations(
 pub async fn insert_market_orders(
     pool: &PgPool,
     market_orders: Vec<nats::MarketOrder>,
-) -> Result<(), sqlx::Error> {
+) -> Result<u64, sqlx::Error> {
     let mut ids: Vec<i64> = Vec::new();
     let mut item_unique_names: Vec<String> = Vec::new();
     let mut location_ids: Vec<String> = Vec::new();
@@ -107,13 +107,12 @@ pub async fn insert_market_orders(
     .execute(pool)
     .await;
 
-    if result.is_err() {
-        print!("{} Error inserting market orders\n", chrono::Local::now());
-    }
+    let mut rows_affected = 0;
 
     match result {
-        Ok(_) => {
+        Ok(result) => {
             transaction.commit().await.unwrap();
+            rows_affected = result.rows_affected();
         }
         Err(e) => {
             print!(
@@ -125,7 +124,7 @@ pub async fn insert_market_orders(
         }
     }
 
-    Ok(())
+    Ok(rows_affected)
 }
 
 pub async fn insert_localizations(
