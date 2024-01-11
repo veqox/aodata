@@ -61,7 +61,6 @@ async fn main() -> Result<(), async_nats::Error> {
         .unwrap();
 
     let message_handler = tokio::spawn(handle_messages(mutex.clone(), pool.clone()));
-    let cleanup_handler = tokio::spawn(cleanup_data(pool.clone()));
 
     print!(
         "{} Connected to NATS server at {}...\n",
@@ -81,42 +80,11 @@ async fn main() -> Result<(), async_nats::Error> {
         mutex.write().await.push(msg.payload);
     }
 
-    _ = tokio::join!(message_handler, cleanup_handler);
+    _ = tokio::join!(message_handler);
 
     pool.close().await;
 
     Ok(())
-}
-
-async fn cleanup_data(pool: Pool<Postgres>) -> Result<(), sqlx::Error> {
-    print!(
-        "{} cleanup_data: Starting cleanup thread...\n",
-        chrono::Local::now()
-    );
-
-    loop {
-        // Perform cleanup every 15 minutes
-        tokio::time::sleep(tokio::time::Duration::from_secs(900)).await;
-
-        print!(
-            "{} cleanup_data: Cleaning up old data...\n",
-            chrono::Local::now()
-        );
-        let transaction = pool.begin().await.unwrap();
-
-        let affected_rows = sqlx::query!("DELETE FROM market_order WHERE expires_at < NOW() OR updated_at < NOW() - INTERVAL '1 day'")
-            .execute(&pool)
-            .await
-            .unwrap();
-
-        print!(
-            "{} cleanup_data: Deleted {} rows...\n",
-            chrono::Local::now(),
-            affected_rows.rows_affected()
-        );
-
-        transaction.commit().await.unwrap();
-    }
 }
 
 async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async_nats::Error> {
