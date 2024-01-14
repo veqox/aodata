@@ -4,51 +4,47 @@
 	import "chartjs-adapter-date-fns";
 	import { onMount } from "svelte";
 
-	export let data: MarketOrderCountByUpdatedAtAndLocation[];
+	let data: MarketOrderCountByUpdatedAtAndLocation[];
 	export let minAmount: number;
 	let canvas: HTMLCanvasElement;
 
-	onMount(() => {
-		let colors = [
-			"#7480ff",
-			"#6873e5",
-			"#5c66cc",
-			"#5159b2",
-			"#454c99",
-			"#3a407f",
-			"#2e3366",
-			"#292d5b",
-		];
+	onMount(async () => {
+		/*let response = await fetch(
+			"https://veqox.dedyn.io/api/statistics/orders?group_by=updated_at, location",
+		);
+		data = await response.json();*/
 
 		let labels = new Array(...new Set(data.map((d) => d.location)));
 		let dates = new Array(...new Set(data.map((d) => d.updated_at)));
 
-		let datasets: { label: string; data: number[], backgroundColor: string, borderColor: string }[] = [];
+		let datasets: {
+			label: string;
+			data: number[];
+		}[] = [];
 
 		labels.forEach((label, i) => {
-			let orderCounts = data.filter((d) => d.location === label).map((d) => d.count);
+			let orderCounts = data
+				.filter((d) => d.location === label)
+				.map((d) => d.count);
 
-			if (orderCounts.reduce((sum, val) => sum += val) < minAmount) {
+			if (orderCounts.reduce((sum, val) => (sum += val)) < minAmount) {
 				return;
 			}
 
 			datasets.push({
 				label,
 				data: orderCounts,
-				backgroundColor: colors[i % colors.length],
-				borderColor: colors[i % colors.length],
 			});
-		}); 
+		});
 
 		datasets.sort((a, b) => {
-			return a.data.reduce((sum, val) => sum += val) < b.data.reduce((sum, val) => sum += val) ?
-				1 : -1
-		})
-
-		datasets.forEach((dataset, i) => {
-			dataset.backgroundColor = colors[i % colors.length];
-			dataset.borderColor = colors[i % colors.length];
+			return a.data.reduce((sum, val) => (sum += val)) <
+				b.data.reduce((sum, val) => (sum += val))
+				? 1
+				: -1;
 		});
+
+		console.log(datasets);
 
 		new Chart(canvas, {
 			type: "line",

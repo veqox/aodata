@@ -1,67 +1,108 @@
 <script lang="ts">
 	import type { PageServerData } from "./$types";
 
-	import MarketOrderCount from "$lib/components/MarketOrderCount.svelte";
-	import MarketOrderCountByLocation from "$lib/components/MarketOrderCountByLocation.svelte";
-	import MarketOrderCountByAuctionType from "$lib/components/MarketOrderCountByAuctionType.svelte";
-	import MarketOrderCountByCreatedAt from "$lib/components/MarketOrderCountByCreatedAt.svelte";
-	import MarketOrderCountByUpdatedAtAndLocation from "$lib/components/MarketOrderCountByUpdatedAtAndLocation.svelte";
-	import MarketOrderCountByUpdatedAt from "$lib/components/MarketOrderCountByUpdatedAt.svelte";
-
 	export let data: PageServerData;
+
+	let standard_number_formatter = new Intl.NumberFormat("en", {
+		notation: "standard",
+	});
+
+	let compact_number_formatter = new Intl.NumberFormat("en", {
+		notation: "compact",
+	});
 </script>
 
 <div class="flex justify-center">
 	<div class="w-11/12">
 		<div class="grid grid-cols-1 justify-evenly md:grid-cols-6">
 			<div class="col-span-2">
-				<MarketOrderCount data={data.props.data.market_order_count} />
+				<div class="shadow stat">
+					<div class="stat-figure text-primary">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							height="40"
+							viewBox="0 -960 960 960"
+							width="40"
+							class="fill-primary"
+							><path
+								d="M480-142.117q-145 0-241.441-40.307-96.442-40.307-96.442-101.422V-680q0-56.922 98.98-97.499Q340.078-818.076 480-818.076q139.615 0 238.845 40.577 99.231 40.577 99.231 97.499v396.154q0 60.807-96.788 101.268T480-142.117Zm0-464.114q85.346 0 172.884-24.077Q740.423-654.385 759.346-683q-18.539-29.385-105.538-54.25-87-24.865-173.808-24.865-87.154 0-173.75 24.019t-106.173 53.557q19.5 30.5 105.404 54.404Q391.385-606.231 480-606.231Zm0 203.385q40.5.192 79.885-3.808 39.384-4 75.577-11.788 36.192-7.789 68.403-18.924 32.212-11.134 58.25-25.519v-151.309q-26.038 14.885-58 26.673-31.961 11.789-68.25 19.885-36.288 8.096-75.577 12.096-39.288 4-80.288 4-41.577 0-81.615-4.192-40.039-4.193-76.289-12.289t-67.711-19.692q-31.462-11.596-56.308-26.481v151.309q25.346 13.885 56.961 25.077 31.616 11.192 67.866 18.981 36.25 7.788 76.038 11.885 39.789 4.096 81.058 4.096Zm0 204.769q48.693 0 96.019-6.577 47.327-6.577 86.039-17.846 38.711-11.269 65.538-26.365 26.827-15.096 34.519-31.443v-126.309q-26.038 14.077-58.25 25.365-32.211 11.289-68.557 18.924-36.346 7.634-75.577 11.634T480-346.886q-41.577 0-81.615-4.096-40.039-4.096-76.135-11.789-36.096-7.692-67.712-18.827-31.615-11.134-56.461-25.327v127.233q7.692 16.731 33.866 31.327 26.173 14.596 64.884 25.865 38.711 11.269 86.192 17.846 47.481 6.577 96.981 6.577Z"
+							/></svg
+						>
+					</div>
+					<div class="stat-title">Market Orders</div>
+					<div class="stat-value text-primary">
+						{compact_number_formatter.format(
+							data.props.data.market_order_count.count,
+						)}
+					</div>
+					<div class="stat-desc">
+						{standard_number_formatter.format(
+							data.props.data.market_order_count.count,
+						)}
+
+						Market Orders
+					</div>
+				</div>
 			</div>
 
-
-			{#each data.props.data.market_order_count_by_auction_type as { auction_type, count }}
 			<div class="col-span-2">
-				<MarketOrderCountByAuctionType
-					data={{ auction_type, count }}
-					type={auction_type}
-				/>
-			</div>
-			{/each}
-		</div>
+				<div class="shadow stat">
+					<div class="stat-figure text-primary">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							height="40"
+							viewBox="0 -960 960 960"
+							width="40"
+							class="fill-primary"
+							><path
+								d="M830.615-521.077v318.769q0 30.308-21 51.307-21 21-51.308 21H202.923q-30.307 0-51.307-21-21-20.999-21-51.307v-319.538q-24.154-19.847-36.27-51.5-12.115-31.654-.5-68.346l40.462-132.154q8-25.23 27.154-40.692 19.154-15.461 45.769-15.461H753.23q26.616 0 45.462 14.769 18.846 14.769 27.461 40.615l41.231 132.923q11.615 36.692-.5 68.115-12.115 31.423-36.269 52.5Zm-262-28.922q32.77 0 49.27-20.039 16.5-20.038 13.5-43.038l-24.307-156.925h-96.463V-612q0 25.231 17.077 43.616 17.077 18.385 40.923 18.385Zm-180 0q27.616 0 44.809-18.385 17.192-18.385 17.192-43.616v-158.001h-96.463l-24.308 158.463q-3.23 21.308 13.385 41.423 16.616 20.116 45.385 20.116Zm-178 0q22.231 0 38.232-15.5 16-15.501 19.769-38.962l23.539-165.54h-84.924q-6.539 0-10.385 2.885-3.847 2.885-5.77 8.655l-38.461 130.153q-7.924 25.77 7.461 52.039 15.385 26.27 50.539 26.27Zm540 0q32.462 0 49.693-25.5 17.231-25.501 8.308-52.809l-40.461-130.923q-1.924-5.769-5.77-8.27-3.846-2.5-10.385-2.5h-82.924l23.539 165.54q3.769 23.461 19.769 38.962 16 15.5 38.231 15.5Zm-547.692 360h555.384q5.386 0 8.847-3.462 3.462-3.462 3.462-8.847v-291.231q-6.538 2.384-10.923 2.961t-9.078.577q-27 0-47.5-9.769t-39.73-31.308q-16.846 18.769-39.846 29.923-23 11.154-52.462 11.154-25.462 0-48-10.577t-42.462-30.5q-18.538 19.923-42 30.5-23.461 10.577-47.538 10.577-27.077 0-50.769-9.807-23.693-9.808-41.693-31.27-25.231 25.231-46.5 33.154-21.269 7.923-41.5 7.923-4.692 0-9.692-.577-5.001-.577-10.308-2.961v291.231q0 5.385 3.461 8.847 3.462 3.462 8.847 3.462Zm555.384 0H202.923h555.384Z"
+							/></svg
+						>
+					</div>
+					<div class="stat-title">Sell Orders</div>
+					<div class="stat-value text-primary">
+						{compact_number_formatter.format(
+							data.props.data.market_order_count_offer.count,
+						)}
+					</div>
+					<div class="stat-desc">
+						{standard_number_formatter.format(
+							data.props.data.market_order_count_offer.count,
+						)}
 
-		<div class="col-span-6 shadow stat">
-			<div class="stat-title">Market Orders By Creation Date</div>
-			<div class="stat-value">
-				<MarketOrderCountByCreatedAt
-					data={data.props.data.market_order_count_by_created_at}
-				/>
+						Sell Orders
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="col-span-3 shadow stat">
-			<div class="stat-title">Market Orders By Last Update</div>
-			<div class="stat-value">
-				<MarketOrderCountByUpdatedAt
-					data={data.props.data.market_order_count_by_updated_at}
-				/>	
-			</div>
-		</div>
-		<div class="col-span-3 shadow stat">
-			<div class="stat-title">Market Orders By Last Update</div>
-			<div class="stat-value">
-				<MarketOrderCountByUpdatedAtAndLocation
-					data={data.props.data.market_order_count_by_updated_at_and_location}
-					minAmount={10000}
-				/>	
-			</div>
-		</div>
 
-		<div class="col-span-6 shadow stat">
-			<div class="stat-title">Market Orders By Location</div>
-			<div class="stat-value">
-				<MarketOrderCountByLocation
-				data={data.props.data.market_order_count_by_location}
-				minAmount={10000}
-			/>
+			<div class="col-span-2">
+				<div class="shadow stat">
+					<div class="stat-figure text-primary">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							height="40"
+							viewBox="0 -960 960 960"
+							width="40"
+							class="fill-primary"
+							><path
+								d="M286.154-97.694q-29.153 0-49.576-20.422-20.423-20.423-20.423-49.577 0-29.153 20.423-49.576 20.423-20.423 49.576-20.423 29.154 0 49.577 20.423t20.423 49.576q0 29.154-20.423 49.577-20.423 20.422-49.577 20.422Zm387.692 0q-29.154 0-49.577-20.422-20.423-20.423-20.423-49.577 0-29.153 20.423-49.576 20.423-20.423 49.577-20.423 29.153 0 49.576 20.423 20.423 20.423 20.423 49.576 0 29.154-20.423 49.577-20.423 20.422-49.576 20.422ZM240.615-730 342-517.692h272.692q3.462 0 6.154-1.731 2.693-1.731 4.616-4.808l107.307-195q2.308-4.231.385-7.5-1.923-3.27-6.539-3.27h-486Zm-28.769-59.998h555.383q24.538 0 37.115 20.884 12.577 20.885 1.192 42.654L677.384-494.309q-9.847 17.308-26.039 26.962-16.192 9.653-35.499 9.653H324l-46.308 84.616q-3.077 4.616-.192 10.001t8.654 5.385h457.691v59.998H286.154q-39.999 0-60.115-34.499-20.115-34.5-1.423-68.884l57.078-102.616-145.539-306.308H60.001v-59.998h113.845l38 80ZM342-517.692h280-280Z"
+							/></svg
+						>
+					</div>
+					<div class="stat-title">Buy Orders</div>
+					<div class="stat-value text-primary">
+						{compact_number_formatter.format(
+							data.props.data.market_order_count_request.count,
+						)}
+					</div>
+					<div class="stat-desc">
+						{standard_number_formatter.format(
+							data.props.data.market_order_count_request.count,
+						)}
+
+						Buy Orders
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
