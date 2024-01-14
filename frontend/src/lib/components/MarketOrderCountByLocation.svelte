@@ -3,11 +3,15 @@
 	import { Chart, Colors } from "chart.js/auto";
 	import { onMount } from "svelte";
 
-	export let data: MarketOrderCountByLocation[];
+	let data: MarketOrderCountByLocation[];
 	export let minAmount: number;
 	let canvas: HTMLCanvasElement;
 
-	onMount(() => {
+	onMount(async() => {
+		let response = await fetch(
+			"https://veqox.dedyn.io/api/statistics/orders?group_by=location",
+		);
+		data = await response.json();
 
 		data = data.filter((d) => d.count > minAmount);
 
@@ -29,7 +33,6 @@
 							"#2e3366",
 							"#292d5b",
 						],
-						
 					},
 				],
 			},

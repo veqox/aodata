@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { MarketOrderCountByUpdatedAtAndLocation } from "$lib/types";
+	import type { MarketOrderCountByCreatedAtAndLocation } from "$lib/types";
 	import { Chart } from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
 	import { onMount } from "svelte";
 
-	let data: MarketOrderCountByUpdatedAtAndLocation[];
+	let data: MarketOrderCountByCreatedAtAndLocation[];
 	export let minAmount: number;
 	let canvas: HTMLCanvasElement;
 
 	onMount(async () => {
 		let response = await fetch(
-			"https://veqox.dedyn.io/api/statistics/orders?group_by=updated_at, location",
+			"https://veqox.dedyn.io/api/statistics/orders?group_by=created_at, location",
 		);
 		data = await response.json();
 
@@ -26,7 +26,7 @@
 		];
 
 		let labels = new Array(...new Set(data.map((d) => d.location)));
-		let dates = new Array(...new Set(data.map((d) => d.updated_at)));
+		let dates = new Array(...new Set(data.map((d) => d.created_at)));
 
 		let datasets: {
 			label: string;

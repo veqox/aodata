@@ -1,5 +1,10 @@
 <script lang="ts">
+	import MarketOrderCountByUpdatedAtAndLocation from '$lib/components/MarketOrderCountByUpdatedAtAndLocation.svelte';
+	import MarketOrderCountByCreatedAt from "$lib/components/MarketOrderCountByCreatedAt.svelte";
+	import MarketOrderCountByUpdatedAt from "$lib/components/MarketOrderCountByUpdatedAt.svelte";
+	import MarketOrderCountByLocation from "$lib/components/MarketOrderCountByLocation.svelte";
 	import type { PageServerData } from "./$types";
+	import MarketOrderCountByCreatedAtAndLocation from '$lib/components/MarketOrderCountByCreatedAtAndLocation.svelte';
 
 	export let data: PageServerData;
 
@@ -103,6 +108,47 @@
 						Buy Orders
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<div class="col-span-6 shadow stat">
+			<div class="stat-title">Market Orders By Creation Date</div>
+			<div class="stat-value">
+				<MarketOrderCountByCreatedAt />
+			</div>
+		</div>
+		
+		<div class="col-span-6 shadow stat">
+			<div class="stat-title">Market Orders By Creation Date</div>
+			<div class="stat-value">
+				<MarketOrderCountByCreatedAtAndLocation
+					minAmount={10000} 
+				/>
+			</div>
+		</div>
+		
+		<div class="col-span-3 shadow stat">
+			<div class="stat-title">Market Orders By Last Update</div>
+			<div class="stat-value">
+				<MarketOrderCountByUpdatedAt />
+			</div>
+		</div>
+		
+		<div class="col-span-3 shadow stat">
+			<div class="stat-title">Market Orders By Last Update</div>
+			<div class="stat-value">
+				<MarketOrderCountByUpdatedAtAndLocation
+					minAmount={10000}
+				/>
+			</div>
+		</div>
+
+		<div class="col-span-6 shadow stat">
+			<div class="stat-title">Market Orders By Location</div>
+			<div class="stat-value">
+				<MarketOrderCountByLocation
+					minAmount={10000}
+				/>
 			</div>
 		</div>
 	</div>

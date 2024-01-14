@@ -4,10 +4,16 @@
 	import "chartjs-adapter-date-fns";
 	import { onMount } from "svelte";
 
-	export let data: MarketOrderCountByUpdatedAt[];
+	let data: MarketOrderCountByUpdatedAt[];
 	let canvas: HTMLCanvasElement;
 
-	onMount(() => {
+	onMount(async() => {
+
+		let response = await fetch(
+			"https://veqox.dedyn.io/api/statistics/orders?group_by=updated_at",
+		);
+		data = await response.json();
+
 		new Chart(canvas, {
 			type: "line",
 			data: {
