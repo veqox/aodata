@@ -61,6 +61,7 @@ async fn main() -> Result<(), async_nats::Error> {
         .unwrap();
 
     let message_handler = tokio::spawn(handle_messages(mutex.clone(), pool.clone()));
+    let materialized_views_updater = tokio::spawn(update_materialized_views(pool.clone()));
 
     print!(
         "{} Connected to NATS server at {}...\n",
@@ -80,11 +81,42 @@ async fn main() -> Result<(), async_nats::Error> {
         mutex.write().await.push(msg.payload);
     }
 
-    _ = tokio::join!(message_handler);
+    _ = tokio::join!(message_handler, materialized_views_updater);
 
     pool.close().await;
 
     Ok(())
+}
+
+async fn update_materialized_views(pool: Pool<Postgres>) -> Result<(), async_nats::Error> {
+    print!(
+        "{} update_materialized_views: Starting update materialized view thread...\n",
+        chrono::Local::now()
+    );
+
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+
+        print!(
+            "{} update_materialized_views: Updating materialized views...\n",
+            chrono::Local::now()
+        );
+
+        let transaction = pool.begin().await.unwrap();
+
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_created_at_and_location").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_updated_at_and_location").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_created_at").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_updated_at").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_location").execute(&pool).await.unwrap();
+
+        transaction.commit().await.unwrap();
+
+        print!(
+            "{} update_materialized_views: Updated materialized views...\n",
+            chrono::Local::now()
+        ); 
+    }
 }
 
 async fn handle_messages(mutex: Mutex, pool: Pool<Postgres>) -> Result<(), async_nats::Error> {
