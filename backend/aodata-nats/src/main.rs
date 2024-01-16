@@ -95,7 +95,7 @@ async fn update_materialized_views(pool: Pool<Postgres>) -> Result<(), async_nat
     );
 
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 10)).await;
 
         print!(
             "{} update_materialized_views: Updating materialized views...\n",
@@ -104,11 +104,11 @@ async fn update_materialized_views(pool: Pool<Postgres>) -> Result<(), async_nat
 
         let transaction = pool.begin().await.unwrap();
 
-        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_created_at_and_location").execute(&pool).await.unwrap();
-        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_updated_at_and_location").execute(&pool).await.unwrap();
-        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_created_at").execute(&pool).await.unwrap();
-        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_updated_at").execute(&pool).await.unwrap();
-        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW CONCURRENTLY market_orders_count_by_location").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW market_orders_count_by_created_at_and_location").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW market_orders_count_by_updated_at_and_location").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW market_orders_count_by_created_at").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW market_orders_count_by_updated_at").execute(&pool).await.unwrap();
+        let _ = sqlx::query!("REFRESH MATERIALIZED VIEW market_orders_count_by_location").execute(&pool).await.unwrap();
 
         transaction.commit().await.unwrap();
 
