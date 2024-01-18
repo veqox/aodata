@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { get_backend_url } from "$lib/env";
 	import type { LocalizedNames } from "$lib/types";
 
 	let items: LocalizedNames[] = [];
 	let search_value = "";
 	const search = async () => {
 		let res = await fetch(
-			`${get_backend_url()}/items?name=${search_value}`,
+			`https://veqox.dedyn.io/api/items?name=${search_value}`,
 		);
 		let json = (await res.json()) as LocalizedNames[];
 		items = json;

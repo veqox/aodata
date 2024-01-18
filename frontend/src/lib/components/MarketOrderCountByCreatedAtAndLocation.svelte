@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { get_backend_url } from "$lib/env";
 	import type { MarketOrderCountByCreatedAtAndLocation } from "$lib/types";
 	import { Chart } from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
@@ -11,7 +10,7 @@
 
 	onMount(async () => {
 		let response = await fetch(
-			`${get_backend_url()}/statistics/orders?group_by=created_at, location`,
+			`https://veqox.dedyn.io/api/statistics/orders?group_by=created_at, location`,
 		);
 		data = await response.json();
 
@@ -107,4 +106,10 @@
 	});
 </script>
 
-<canvas bind:this={canvas}></canvas>
+
+<div class="shadow stat">
+	<div class="stat-title">Market Orders By Creation Date</div>
+	<div class="stat-value">
+		<canvas bind:this={canvas}></canvas>
+	</div>
+</div>

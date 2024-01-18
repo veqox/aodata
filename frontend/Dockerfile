@@ -4,8 +4,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-ENV ENV=PROD
-
 COPY . .
 RUN npm ci
 RUN npm run build

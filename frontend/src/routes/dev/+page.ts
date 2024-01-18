@@ -1,16 +1,16 @@
-import { get_backend_url } from "$lib/env";
 import type { MarketOrderCount } from "$lib/types";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch }) => {
+  /*
   let market_order_count_request_response = await fetch(
-    `${get_backend_url()}/statistics/orders/count?auction_type=request`,
+    `https://veqox.dedyn.io/api/statistics/orders/count?auction_type=request`,
   );
   let market_order_count_offer_response = await fetch(
-    `${get_backend_url()}/statistics/orders/count?auction_type=offer`,
+    `https://veqox.dedyn.io/api/statistics/orders/count?auction_type=offer`,
   );
   let market_order_count_response = await fetch(
-    `${get_backend_url()}/statistics/orders/count`,
+    `https://veqox.dedyn.io/api/statistics/orders/count`,
   );
 
   let market_order_count =
@@ -29,4 +29,5 @@ export const load: PageLoad = async ({ fetch }) => {
       },
     },
   };
+  */
 };

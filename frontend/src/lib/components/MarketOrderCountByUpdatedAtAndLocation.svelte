@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { get_backend_url } from "$lib/env";
 	import type { MarketOrderCountByUpdatedAtAndLocation } from "$lib/types";
 	import { Chart } from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
@@ -11,7 +10,7 @@
 
 	onMount(async () => {
 		let response = await fetch(
-			`${get_backend_url()}/statistics/orders?group_by=updated_at, location`,
+			`https://veqox.dedyn.io/api/statistics/orders?group_by=updated_at, location`,
 		);
 		data = await response.json();
 
@@ -107,4 +106,8 @@
 	});
 </script>
 
-<canvas bind:this={canvas}></canvas>
+
+<div class="stat-title">Market Orders By Last Update</div>
+<div class="stat-value">
+	<canvas bind:this={canvas}></canvas>
+</div>
