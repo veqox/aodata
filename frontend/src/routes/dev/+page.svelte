@@ -3,10 +3,10 @@
 	import MarketOrderCountByCreatedAt from "$lib/components/MarketOrderCountByCreatedAt.svelte";
 	import MarketOrderCountByUpdatedAt from "$lib/components/MarketOrderCountByUpdatedAt.svelte";
 	import MarketOrderCountByLocation from "$lib/components/MarketOrderCountByLocation.svelte";
-	import type { PageServerData } from "./$types";
 	import MarketOrderCountByCreatedAtAndLocation from '$lib/components/MarketOrderCountByCreatedAtAndLocation.svelte';
+	import type { PageData } from './$types';
 
-	export let data: PageServerData;
+	export let data: PageData;
 
 	let standard_number_formatter = new Intl.NumberFormat("en", {
 		notation: "standard",
