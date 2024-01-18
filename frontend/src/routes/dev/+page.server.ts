@@ -1,15 +1,16 @@
+import { get_backend_url } from "$lib/env";
 import type { MarketOrderCount } from "$lib/types";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ fetch }) => {
   let market_order_count_request_response = await fetch(
-    "http://aodata-api:8080/api/statistics/orders/count?auction_type=request",
+    `${get_backend_url()}/statistics/orders/count?auction_type=request`,
   );
   let market_order_count_offer_response = await fetch(
-    "http://aodata-api:8080/api/statistics/orders/count?auction_type=offer",
+    `${get_backend_url()}/statistics/orders/count?auction_type=offer`,
   );
   let market_order_count_response = await fetch(
-    "http://aodata-api:8080/api/statistics/orders/count",
+    `${get_backend_url()}/statistics/orders/count`,
   );
 
   let market_order_count =

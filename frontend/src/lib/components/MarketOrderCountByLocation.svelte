@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { get_backend_url } from "$lib/env";
 	import type { MarketOrderCountByLocation } from "$lib/types";
 	import { Chart, Colors } from "chart.js/auto";
 	import { onMount } from "svelte";
@@ -9,7 +10,7 @@
 
 	onMount(async() => {
 		let response = await fetch(
-			"https://veqox.dedyn.io/api/statistics/orders?group_by=location",
+			`${get_backend_url()}/statistics/orders?group_by=location`,
 		);
 		data = await response.json();
 
