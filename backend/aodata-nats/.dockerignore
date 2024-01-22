@@ -5,4 +5,3 @@ download.sh
 .gitignore
 docker-compose.yml
 .env
-.env.prod
