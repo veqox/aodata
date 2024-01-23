@@ -27,11 +27,17 @@
 	};
 
 	const get_prices = async () => {
+		let yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		
+		let from_string = yesterday.toISOString().split('T')[0];
+		
 		const res = await fetch(
 			`https://veqox.dedyn.io/api/items/${item}/orders?auction_type=offer&limit=${page_size}&offset=${
 				page * page_size
-			}`,
+			}&from=${from_string}`,
 		);
+
 		const json = await res.json() as MarketOrder[];
 
         if (!json) return [];
