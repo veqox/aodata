@@ -1,6 +1,6 @@
 services:
-  aodata-nats:
-    container_name: aodata-nats
+  aodata-nats-orders:
+    container_name: aodata-nats-orders
     build:
       context: .
       dockerfile: Dockerfile

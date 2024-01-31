@@ -1,2 +1,2 @@
 pub mod nats;
-pub mod json;
+pub mod db;

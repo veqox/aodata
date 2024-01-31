@@ -1,5 +1,5 @@
 [package]
-name = "aodata-nats"
+name = "aodata-nats-orders"
 version = "0.1.0"
 edition = "2021"
 

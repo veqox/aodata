@@ -1,0 +1,11 @@
+services:
+  aodata-nats-histories:
+    container_name: aodata-nats-histories
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - ./data:/data
+    restart: unless-stopped
+    depends_on:
+      - aodata-db
