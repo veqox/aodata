@@ -24,7 +24,7 @@ impl MarketHistory {
                 location_id: format!("{:0>4}", marketistory.location_id.to_string()),
                 quality_level: marketistory.quality_level.as_i64().unwrap() as i32,
                 timescale: marketistory.timescale.as_i64().unwrap() as i32,
-                timestamp: chrono::NaiveDateTime::from_timestamp_millis(market_history_entrie.timestamp.as_i64().unwrap() / 10000).unwrap(),
+                timestamp: chrono::NaiveDateTime::from_timestamp_millis(market_history_entrie.timestamp.as_i64().unwrap() / 10000 - 62136892800000).unwrap(),
                 item_amount: market_history_entrie.item_amount.as_i64().unwrap() as i32,
                 silver_amount: market_history_entrie.silver_amount.as_i64().unwrap() as i32,
                 created_at: chrono::Utc::now().naive_utc(),
