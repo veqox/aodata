@@ -1,6 +1,6 @@
 include:
   - aodata-db/docker-compose.yml
-  - aodata-db-tool/docker-compose.yml
+  #- aodata-db-tool/docker-compose.yml
   - aodata-nats-histories/docker-compose.yml
   - aodata-nats-orders/docker-compose.yml
   - aodata-api/docker-compose.yml
