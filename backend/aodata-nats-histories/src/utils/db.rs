@@ -65,7 +65,7 @@ SELECT * FROM UNNEST(
     $7::INT[],
     $8::TIMESTAMP[],
     $9::TIMESTAMP[])
-ON CONFLICT (item_unique_name, location_id, quality_level, timescale, timestamp) DO
+ON CONFLICT (item_unique_name, location_id, quality_level, timescale, timestamp, updated_at) DO
     UPDATE SET
         updated_at = EXCLUDED.updated_at,
         silver_amount = EXCLUDED.silver_amount,

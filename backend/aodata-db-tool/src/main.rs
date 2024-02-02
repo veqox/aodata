@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
-mod utils;
 mod models;
+mod utils;
 
 #[tokio::main]
 async fn main() {
@@ -13,7 +13,7 @@ async fn main() {
         .connect(db_url)
         .await
         .unwrap();
-    
+
     let localizations = utils::json::get_localizations_from_file(dotenv!("LOCALIZATIONS_PATH"));
     let locations = utils::json::get_locations_from_file(dotenv!("LOCATIONS_PATH"));
 
@@ -33,7 +33,7 @@ async fn main() {
         Ok(_) => println!("Inserted localizations"),
         Err(e) => println!("Error inserting localizations: {}", e),
     }
-    
+
     let result = utils::db::insert_locations(&pool, locations).await;
 
     match result {

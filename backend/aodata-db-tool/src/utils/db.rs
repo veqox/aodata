@@ -40,7 +40,7 @@ pub async fn insert_localizations(
     for localization in localizations {
         let item_id: i32 = match localization.id.parse() {
             Ok(id) => id, // should be fine since item ids go to 10572 as of 2024-30-01
-            Err(e) => continue,
+            Err(_) => continue,
         };
 
         sqlx::query!(
