@@ -2,13 +2,10 @@
 pub struct Localization {
     #[serde(rename = "LocalizedNames")]
     pub localized_names: Option<LocalizedName>,
-
     #[serde(rename = "LocalizedDescriptions")]
     pub localized_descriptions: Option<LocalizedDescription>,
-
     #[serde(rename = "UniqueName")]
     pub item: String,
-
     #[serde(rename = "Index")]
     pub id: String,
 }

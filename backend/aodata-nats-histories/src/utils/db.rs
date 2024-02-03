@@ -1,4 +1,4 @@
-use crate::models::{db, nats};
+use aodata_models::{db, nats};
 use sqlx::{postgres::PgQueryResult, types::chrono, PgPool};
 
 pub async fn insert_market_histories(
@@ -17,6 +17,7 @@ pub async fn insert_market_histories(
 
     for market_history in market_histories {
         db::MarketHistory::from_nats(market_history)
+            .unwrap()
             .iter()
             .rev()
             .for_each(|market_history| {

@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
-mod models;
 mod utils;
 
 #[tokio::main]

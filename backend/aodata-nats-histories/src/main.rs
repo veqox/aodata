@@ -8,9 +8,7 @@ use sqlx::types::chrono;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-
-mod models;
-use models::nats;
+use aodata_models::nats;
 
 mod utils;
 

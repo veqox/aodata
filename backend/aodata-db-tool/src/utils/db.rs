@@ -1,4 +1,4 @@
-use crate::models::json;
+use aodata_models::json;
 use sqlx::PgPool;
 
 pub async fn insert_locations(

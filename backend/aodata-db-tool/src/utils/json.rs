@@ -1,4 +1,4 @@
-use crate::models::json;
+use aodata_models::json;
 
 pub fn get_localizations_from_file(path: &str) -> Option<Vec<json::Localization>> {
     return match std::fs::read_to_string(path) {
